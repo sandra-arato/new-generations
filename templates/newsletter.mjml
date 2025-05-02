@@ -1,0 +1,25 @@
+<mjml>
+  <mj-body>
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="24px" font-weight="bold">{{title}}</mj-text>
+        <mj-text font-size="16px">{{intro}}</mj-text>
+      </mj-column>
+    </mj-section>
+    {{#each articles}}
+    <mj-section>
+      <mj-column>
+        <mj-image src="{{image}}" alt="{{title}}" />
+        <mj-text font-size="18px" font-weight="bold">{{title}}</mj-text>
+        <mj-text>{{summary}}</mj-text>
+        <mj-button href="{{url}}">Read more</mj-button>
+      </mj-column>
+    </mj-section>
+    {{/each}}
+    <mj-section>
+      <mj-column>
+        <mj-text font-size="14px" color="#888">You are receiving this newsletter because you subscribed to updates.</mj-text>
+      </mj-column>
+    </mj-section>
+  </mj-body>
+</mjml> 
