@@ -67,5 +67,78 @@ pnpm run build
 - Add new tools in `src/tools.ts` and register them in `src/server.ts`.
 - Follow SOLID principles for maintainability.
 
+## Local-First Content Automation Workflow
+
+This project is designed for a local-first, code-driven workflow. All automation logic and data live in the repository, and you interact with the MCP server using HTTP endpoints or via Cursor as an MCP client.
+
+### Sources File Structure
+
+The `sources.json` file is an array of link objects. Each link has:
+- `url` (string): The link URL
+- `metadata` (object, optional): Any extra data
+- `compiled` (boolean): Whether the link has been used/compiled
+
+Example:
+```json
+[
+  {
+    "url": "https://example.com/article",
+    "metadata": { "tag": "news" },
+    "compiled": false
+  }
+]
+```
+
+### MCP Tools
+
+#### Add a Link
+Add a new link to the sources list.
+
+**HTTP Example:**
+```sh
+curl -X POST http://localhost:3001/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "method": "add-link",
+    "params": { "url": "https://example.com/article" },
+    "id": 1,
+    "jsonrpc": "2.0"
+  }'
+```
+
+#### List Uncompiled Links
+List all links that have not yet been compiled.
+
+**HTTP Example:**
+```sh
+curl -X POST http://localhost:3001/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "method": "uncompiled-links",
+    "params": {},
+    "id": 2,
+    "jsonrpc": "2.0"
+  }'
+```
+
+#### Mark a Link as Compiled
+Mark a link as compiled in the sources list.
+
+**HTTP Example:**
+```sh
+curl -X POST http://localhost:3001/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "method": "mark-compiled",
+    "params": { "url": "https://example.com/article" },
+    "id": 3,
+    "jsonrpc": "2.0"
+  }'
+```
+
+### Using with Cursor
+
+Add the MCP server to your `.cursor/mcp.json` and use the built-in tools from Cursor's command palette. No additional CLI wrapper is required.
+
 ## License
 MIT 
