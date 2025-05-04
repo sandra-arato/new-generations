@@ -7,6 +7,13 @@ export function registerTools(server: McpServer, sourcesIO: {
 }, logger: { info: Function, warn: Function, error: Function }) {
   server.tool(
     'add-link',
+    `
+    Add a new link to the sources list.
+
+    Parameters:
+    - url: The URL of the link to add.
+    - metadata: Optional metadata to add to the link.
+    `,
     {
       url: z.string().url(),
       metadata: z.record(z.any()).optional(),
@@ -39,12 +46,14 @@ export function registerTools(server: McpServer, sourcesIO: {
           isError: true,
         };
       }
-    }
+    },
   );
 
   server.tool(
     'uncompiled-links',
-    {},
+    `
+    List all links that have not yet been compiled.
+    `,
     async () => {
       try {
         const sources = sourcesIO.readSources();
@@ -63,11 +72,17 @@ export function registerTools(server: McpServer, sourcesIO: {
           isError: true,
         };
       }
-    }
+    },
   );
 
   server.tool(
     'mark-compiled',
+    `
+    Mark a link as compiled in the sources list.
+
+    Parameters:
+    - url: The URL of the link to mark as compiled.
+    `,
     {
       url: z.string().url(),
     },
@@ -99,6 +114,6 @@ export function registerTools(server: McpServer, sourcesIO: {
           isError: true,
         };
       }
-    }
+    },
   );
 } 

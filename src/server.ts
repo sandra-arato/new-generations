@@ -66,6 +66,7 @@ export function startServer() {
     version: '0.1.0-beta.1',
   });
   registerTools(server, sourcesIO, logger);
+  logger.info('Registered tools:', Object.entries((server as any)._registeredTools).map(([name, tool]) => ({ name, description: (tool as any).description })));
 
   app.post('/mcp', async (req, res) => {
     logger.info('New client connection via POST from', req.ip);
