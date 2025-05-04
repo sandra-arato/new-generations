@@ -1,4 +1,4 @@
-mcp-server/node_modules
-mcp-server/dist
+node_modules/
+dist/
+coverage/
 .env
-node_modules
