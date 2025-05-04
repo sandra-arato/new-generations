@@ -67,11 +67,17 @@ Q: How should the review process be documented and surfaced to users?
 
 **Clarifying Questions:**
 Q: What is the preferred format and source for Hungarian writing samples?
+A: Make a folder for example soruces for tone. I will later add multiple documents in md format. 
 Q: How many samples are needed for effective modeling?
+A: Use whatever you have in the folder.
 Q: Should translation for style transfer be automated, manual, or both?
+A: automated.
 Q: What are the requirements for prompt engineering—should users be able to customize prompts?
+A: the user should be able to regenerate certain drafts with a tone adjustments, after they manually review the draft. 
 Q: How should the system distinguish and select between Hungarian and English content generation?
+A: default should be English, and user can reprompt to generate in Hungarian too.
 Q: What is the expected output format for generated content?
+A: Generated draft will be different for each format. Newsletter should be mjml, 
 
 ---
 
