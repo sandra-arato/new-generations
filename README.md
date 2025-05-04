@@ -140,5 +140,16 @@ curl -X POST http://localhost:3001/mcp \
 
 Add the MCP server to your `.cursor/mcp.json` and use the built-in tools from Cursor's command palette. No additional CLI wrapper is required.
 
+### Drafts and Generated Content Storage
+
+Generated content and drafts are stored in the `drafts/` directory, organized by output target:
+
+- `drafts/newsletter/` — Newsletter drafts
+- `drafts/substack/` — Substack drafts
+- `drafts/medium/` — Medium drafts
+- `drafts/linkedin/` — LinkedIn drafts
+
+Each generated draft is saved as a file in the appropriate subfolder. You can edit these files directly in your code editor (e.g., Cursor). No additional versioning or UI is required; simply save your changes in the editor.
+
 ## License
 MIT 
