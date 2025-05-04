@@ -140,5 +140,17 @@ curl -X POST http://localhost:3001/mcp \
 
 Add the MCP server to your `.cursor/mcp.json` and use the built-in tools from Cursor's command palette. No additional CLI wrapper is required.
 
+## Voice Modeling with Hungarian and English Samples
+
+To enable advanced tone and style modeling, place example writing samples in the following folders:
+
+- `samples/hungarian/` — Hungarian writing samples (markdown files)
+- `samples/english/` — English writing samples (markdown files)
+
+The system will use these samples to extract tone, style, and structure for prompt engineering. You can regenerate drafts with tone adjustments or in Hungarian after manual review. By default, drafts are generated in English; you can reprompt for Hungarian as needed.
+
+- Newsletter output will be in MJML format.
+- Other formats will match their respective platform requirements.
+
 ## License
 MIT 
