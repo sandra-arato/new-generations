@@ -142,3 +142,40 @@ Add the MCP server to your `.cursor/mcp.json` and use the built-in tools from Cu
 
 ## License
 MIT 
+
+# Text Generation Integration
+
+## 1. Training the Model
+- Train your textgenrnn model manually and save the weights to `./model_weights/your_model_weights.hdf5`.
+- Example training (run in Python):
+  ```python
+  from textgenrnn import textgenrnn
+  textgen = textgenrnn()
+  textgen.train_from_file('your_samples.txt', num_epochs=10)
+  textgen.save('model_weights/your_model_weights.hdf5')
+  ```
+
+## 2. Running the Inference Service
+- Start the Python FastAPI service:
+  ```bash
+  pnpm run start:textgenrnn
+  ```
+- This will load the model weights from `./model_weights/your_model_weights.hdf5` and expose a REST API at `http://127.0.0.1:8000/generate`.
+
+## 3. Starting the MCP Server
+- Start both the MCP server and the inference service together:
+  ```bash
+  pnpm start
+  ```
+
+## 4. Generating Text from TypeScript
+- Use the provided `generateText` function in `src/textgen.ts` to call the inference service:
+  ```typescript
+  import { generateText } from './textgen';
+  const results = await generateText('Your prompt', 0.7, 3);
+  console.log(results);
+  ```
+
+## 5. Model Weights Directory
+- Place your trained model weights in the `./model_weights/` directory at the root of the project.
+- The default filename expected is `your_model_weights.hdf5`. 

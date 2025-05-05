@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+python-dotenv
+pydantic
+textgenrnn
+tensorflow-macos==2.10.0
+tensorflow-metal==0.6.0

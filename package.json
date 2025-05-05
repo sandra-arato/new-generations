@@ -12,7 +12,9 @@
     "test": "jest --env=node --runInBand",
     "build": "tsc",
     "dev": "node dist/src/cli.js --sources ./sources.json --port 3001",
-    "start": "pnpm build && node dist/src/cli.js --sources ./sources.json --port 3001"
+    "start": "pnpm run start:mcp & pnpm run start:textgenrnn",
+    "start:mcp": "ts-node src/server.ts",
+    "start:textgenrnn": "python3 -m uvicorn textgen_inference_service:app --host 127.0.0.1 --port 8000"
   },
   "keywords": [
     "mcp",
@@ -39,9 +41,11 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.0",
+    "@types/node-fetch": "2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
+    "node-fetch": "2",
     "zod": "^3.24.3"
   }
 }
