@@ -1,1 +1,0 @@
-Ez egy példa magyar nyelvű szöveg, amelyet a hangnem, stílus és szerkezet elemzésére használhatunk. A cél, hogy a rendszer képes legyen ezt a stílust angol nyelvű tartalmakban is visszaadni. 
