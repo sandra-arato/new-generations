@@ -1,1 +1,0 @@
-This is a sample English text used for analyzing tone, style, and structure. The goal is for the system to be able to reproduce this style in generated content, including in Hungarian if needed. 
