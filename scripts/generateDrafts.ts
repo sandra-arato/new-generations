@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { registerTools } from '../src/tools';
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';

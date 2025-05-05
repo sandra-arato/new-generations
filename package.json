@@ -39,9 +39,12 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.40.1",
+    "@extractus/article-extractor": "^8.0.18",
     "@modelcontextprotocol/sdk": "^1.11.0",
     "@types/node-fetch": "2",
     "anthropic": "^0.0.0",

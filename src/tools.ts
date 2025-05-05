@@ -1,3 +1,8 @@
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 
@@ -124,26 +129,48 @@ export function registerTools(server: McpServer, sourcesIO: {
     `,
     async () => {
       const fs = await import('fs/promises');
-      const path = await import('path');
       const fetch = (await import('node-fetch')).default;
-      const { adjustTone } = await import('./textgen');
-      const { renderLinkedinNewsletter } = await import('../templates/linkedin-newsletter');
-      const { renderMediumPost } = await import('../templates/medium-post');
-      const { renderSubstackPost } = await import('../templates/substack-post');
+      const { adjustTone } = await import('./textgen.js');
+      const { renderLinkedinNewsletter } = await import('../templates/linkedin-newsletter.js');
+      const { renderMediumPost } = await import('../templates/medium-post.js');
+      const { renderSubstackPost } = await import('../templates/substack-post.js');
       // MJML template will be loaded as a string
-      const mjmlTemplate = await fs.readFile(path.join(__dirname, '../templates/newsletter.mjml'), 'utf8');
+      const mjmlTemplate = await fs.readFile(join(__dirname, '../templates/newsletter.mjml'), 'utf8');
 
-      // Helper: extract main text from HTML (very basic, can be improved)
-      function extractMainText(html: string): string {
+      // Helper: extract main text and title from HTML (improved)
+      async function extractMainTextAndTitle(html: string, url: string): Promise<{ mainText: string, title: string }> {
+        try {
+          const { extractFromHtml } = await import('@extractus/article-extractor');
+          const article = await extractFromHtml(html, url);
+          if (article && article.content && article.title) {
+            // Remove HTML tags from content
+            const mainText = article.content.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+            return { mainText, title: article.title };
+          }
+        } catch (e) {
+          logger.warn('Article extraction failed, falling back to basic extraction:', e);
+        }
+        // Fallback: old method
         const match = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
         let body = match ? match[1] : html;
-        // Remove all tags
-        return body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        const mainText = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+        return { mainText, title: url };
       }
 
-      // Helper: summarize text (prompt-based, can be improved)
-      async function summarize(text: string): Promise<string> {
-        return (await adjustTone(`Summarize this article: ${text.slice(0, 2000)}`))[0];
+      // Helper: summarize text using Anthropic API (Claude)
+      async function summarizeText(text: string): Promise<string> {
+        const { Anthropic } = await import('@anthropic-ai/sdk');
+        const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+        const prompt = `Summarize the following article in 2-3 concise sentences for a technical but non-expert audience.\n\n${text.slice(0, 4000)}`;
+        const response = await anthropic.messages.create({
+          model: 'claude-3-haiku-20240307',
+          max_tokens: 256,
+          messages: [
+            { role: 'user', content: prompt }
+          ],
+        });
+        const textBlock = response.content.find((block: any) => block.type === 'text' && typeof block.text === 'string');
+        return textBlock ? (textBlock as { text: string }).text.trim() : '';
       }
 
       // Helper: generate relevance note
@@ -163,7 +190,7 @@ export function registerTools(server: McpServer, sourcesIO: {
 
       try {
         const sources = sourcesIO.readSources();
-        const uncompiled = sources.filter((s) => !s.compiled).slice(0, 1);
+        const uncompiled = sources.filter((s) => !s.compiled);
         if (uncompiled.length === 0) {
           logger.info('No uncompiled links found.');
           return { content: [{ type: 'text', text: 'No uncompiled links found.' }] };
@@ -177,9 +204,9 @@ export function registerTools(server: McpServer, sourcesIO: {
             const res = await fetch(link.url);
             const html = await res.text();
             logger.info('Fetched HTML for:', link.url);
-            const mainText = extractMainText(html);
-            logger.info('Extracted main text for:', link.url);
-            const summary = await summarize(mainText);
+            const { mainText, title } = await extractMainTextAndTitle(html, link.url);
+            logger.info('Extracted main text and title for:', link.url);
+            const summary = await summarizeText(mainText);
             logger.info('Generated summary for:', link.url);
             const relevance = await relevanceNote(mainText, 'the main topic');
             logger.info('Generated relevance note for:', link.url);
@@ -190,6 +217,7 @@ export function registerTools(server: McpServer, sourcesIO: {
             return {
               ...link,
               mainText,
+              title,
               summary,
               relevance,
               styledSummary: styledSummary[0],
@@ -221,19 +249,22 @@ export function registerTools(server: McpServer, sourcesIO: {
 
         // Prepare articles for templates
         const articlesUnstyled = successful.map(l => ({
-          title: l.url,
+          title: l.title,
           summary: `${l.summary}\n${l.relevance}`,
           url: l.url,
         }));
         const articlesStyled = successful.map(l => ({
-          title: l.url,
+          title: l.title,
           summary: `${l.styledSummary}\n${l.styledRelevance}`,
           url: l.url,
         }));
 
         // Draft title
-        const title = `Curated Insights - ${new Date().toLocaleDateString()}`;
-        const timestamp = Date.now();
+        const now = new Date();
+        const dateStr = now.toISOString().slice(0,10);
+        const timeStr = now.toTimeString().slice(0,8).replace(/:/g, '-');
+        const title = `New Generations - ${dateStr}`;
+        const fileBase = `${title.replace(/[^a-zA-Z0-9_-]/g, '_')}_${timeStr}`;
 
         // Render and save for each platform and style
         const platforms = [
@@ -261,23 +292,25 @@ export function registerTools(server: McpServer, sourcesIO: {
 
         for (const platform of platforms) {
           logger.info(`Rendering and saving drafts for platform: ${platform.name}`);
-          // Unstyled
+          const dirPath = join('drafts', platform.name);
+          await fs.mkdir(dirPath, { recursive: true });
+          // Unstyled: aggregate all articles into one draft
           const draftUnstyled = platform.render({
             title,
             intro,
             articles: articlesUnstyled,
           });
-          const unstyledPath = path.join('drafts', platform.name, `${title.replace(/\s+/g, '_')}_${timestamp}_unstyled.${platform.ext}`);
+          const unstyledPath = join(dirPath, `${fileBase}_unstyled.${platform.ext}`);
           await fs.writeFile(unstyledPath, draftUnstyled, 'utf8');
           logger.info(`Saved unstyled draft: ${unstyledPath}`);
 
-          // Styled
+          // Styled: aggregate all articles into one draft
           const draftStyled = platform.render({
             title,
             intro: styledIntro,
             articles: articlesStyled,
           });
-          const styledPath = path.join('drafts', platform.name, `${title.replace(/\s+/g, '_')}_${timestamp}_styled.${platform.ext}`);
+          const styledPath = join(dirPath, `${fileBase}_styled.${platform.ext}`);
           await fs.writeFile(styledPath, draftStyled, 'utf8');
           logger.info(`Saved styled draft: ${styledPath}`);
         }
