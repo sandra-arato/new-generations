@@ -1,12 +1,6 @@
-#!/usr/bin/env node
-import { startServer } from './server.js';
-import { registerTools } from './tools.js';
+import { registerTools } from '../src/tools';
 import { readFileSync, writeFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { join } from 'path';
 
 const logger = { info: console.log, warn: console.warn, error: console.error };
 const sourcesPath = join(__dirname, '../sources.json');
@@ -18,12 +12,8 @@ const sourcesIO = {
 const server = {
   tool: (_name: string, _desc: string, _schemaOrFn: any, fn?: any) => {
     if (typeof _schemaOrFn === 'function') fn = _schemaOrFn;
-    if (process.argv[2] === 'generate-drafts') {
-      fn().then(console.log).catch(console.error);
-    }
+    fn().then(console.log).catch(console.error);
   }
 };
 
-registerTools(server as any, sourcesIO, logger);
-
-startServer(); 
+registerTools(server as any, sourcesIO, logger); 

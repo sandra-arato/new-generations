@@ -10,10 +10,11 @@
   },
   "scripts": {
     "test": "jest --env=node --runInBand",
-    "build": "tsc",
+    "build": "tsc && pnpm run copy-templates",
+    "copy-templates": "cpx \"templates/newsletter.mjml\" dist/templates/",
     "dev": "node dist/src/cli.js --sources ./sources.json --port 3001",
     "start": "pnpm run start:mcp & pnpm run start:textgenrnn",
-    "start:mcp": "ts-node src/server.ts",
+    "start:mcp": "pnpm run build && node dist/src/cli.js --sources ./sources.json --port 3001",
     "start:textgenrnn": "python3 -m uvicorn textgen_inference_service:app --host 127.0.0.1 --port 8000"
   },
   "keywords": [
@@ -33,6 +34,7 @@
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.3",
     "@types/supertest": "^6.0.3",
+    "cpx": "^1.5.0",
     "jest": "^29.7.0",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
