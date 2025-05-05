@@ -23,25 +23,3 @@ Q: What is the expected behavior if publishing fails on one or more platforms?
 Q: How should 'compiled' links be stored and tracked?
 
 ---
-
-## IDO-13: Create Platform-Specific Templates and Human-in-the-Loop Composition Workflow
-
-**Restated Requirements:**
-- Develop templates and structure for each content type (Medium, Substack, LinkedIn, Email).
-- Integrate AI to adapt tone, voice, and content per platform.
-- Enable review and manual tweaking of drafts in Cursor before publishing.
-
-**Shippable Subtasks:**
-- Define and implement templates for each platform.
-- Integrate AI for tone, voice, and content adaptation per platform.
-- Build UI for human-in-the-loop review and manual tweaking in Cursor.
-- Implement tracking/versioning for user edits if required.
-- Document the review process and provide usage instructions.
-- Write tests for template and review logic.
-
-**Clarifying Questions:**
-Q: Can you provide examples or requirements for each platform's template?
-Q: What AI model/service should be used for tone and voice adaptation?
-Q: What is the expected UI/UX for manual tweaking—should it support suggestions, inline editing, or both?
-Q: Should user edits be tracked or versioned?
-Q: How should the review process be documented and surfaced to users?

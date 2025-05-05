@@ -9,6 +9,8 @@ import { config } from './config.js';
 import { logger } from './logger.js';
 import type { AnyZodObject } from 'zod';
 import { SSEServerTransport } from '@modelcontextprotocol/sdk/server/sse.js';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
 
 function makeSourcesIO(sourcesPath: string) {
   return {
@@ -168,6 +170,25 @@ export function startServer() {
         annotations: (tool as any).annotations,
       }));
     res.json({ tools });
+  });
+
+  // Add HTTP endpoint for generateDrafts
+  app.post('/generate-drafts', async (req, res) => {
+    let result: any = null;
+    const server = {
+      tool: (_name: string, _desc: string, _schemaOrFn: any, fn?: any) => {
+        if (typeof _schemaOrFn === 'function') fn = _schemaOrFn;
+        result = fn();
+      }
+    };
+    registerTools(server as any, sourcesIO, logger);
+    try {
+      const output = await result;
+      res.json(output);
+    } catch (err) {
+      logger.error('Error in /generate-drafts:', err);
+      res.status(500).json({ error: (err as any)?.message || err });
+    }
   });
 
   app.listen(config.port, () => {

@@ -1,2 +1,22 @@
-[]
-
+[
+  {
+    "url": "https://github.com/jixiaozhong/Sonic",
+    "compiled": true
+  },
+  {
+    "url": "https://context7.com/",
+    "compiled": true
+  },
+  {
+    "url": "https://modelcontextprotocol.io/introduction",
+    "compiled": true
+  },
+  {
+    "url": "https://www.gumloop.com/mcp",
+    "compiled": true
+  },
+  {
+    "url": "https://www.gumloop.com/blog/what-is-mcp-model-context-protocol-a-simple-guide",
+    "compiled": true
+  }
+]
