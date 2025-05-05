@@ -2,3 +2,16 @@ node_modules/
 dist/
 coverage/
 .env
+samples/*
+samples/.DS_Store
+.DS_Store
+model_weights/*
+__pycache__/*
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pyw
+*.pyz
+*.pywz
+*.pyzw
